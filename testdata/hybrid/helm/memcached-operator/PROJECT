@@ -1,0 +1,14 @@
+domain: example.com
+layout:
+- hybrid/v1-alpha
+projectName: memcached-operator
+repo: github.com/example/memcached-operator
+resources:
+- api:
+    crdVersion: v1
+    namespaced: true
+  domain: example.com
+  group: cache
+  kind: Memcached
+  version: v1alpha1
+version: "3"
