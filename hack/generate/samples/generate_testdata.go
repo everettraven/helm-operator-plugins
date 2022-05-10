@@ -21,7 +21,10 @@ import (
 
 	log "github.com/sirupsen/logrus"
 
-	"github.com/operator-framework/helm-operator-plugins/hack/generate/samples/internal/hybrid"
+	gohelmsamples "github.com/operator-framework/helm-operator-plugins/hack/generate/samples/internal/hybrid/go-helm-samples"
+	gosamples "github.com/operator-framework/helm-operator-plugins/hack/generate/samples/internal/hybrid/go-samples"
+	helmsamples "github.com/operator-framework/helm-operator-plugins/hack/generate/samples/internal/hybrid/helm-samples"
+	"github.com/operator-framework/helm-operator-plugins/hack/generate/samples/internal/samples"
 )
 
 func main() {
@@ -50,7 +53,14 @@ func main() {
 	samplesPath := filepath.Join(wd, "testdata")
 	log.Infof("writing sample directories under %s", samplesPath)
 
-	log.Infof("creating Hybrid Memcached Sample")
-	hybrid.GenerateMemcachedSamples(binaryPath, samplesPath)
+	var samples []samples.Sample
 
+	samples = append(samples, gosamples.NewGoMemcached(gosamples.WithBinaryPath(binaryPath), gosamples.WithSamplesPath(filepath.Join(samplesPath, "hybrid", "go"))))
+	samples = append(samples, helmsamples.NewHelmSample(helmsamples.WithBinaryPath(binaryPath), helmsamples.WithSamplesPath(filepath.Join(samplesPath, "hybrid", "helm"))))
+	samples = append(samples, gohelmsamples.NewGoHelmMemcached(gohelmsamples.WithBinaryPath(binaryPath), gohelmsamples.WithSamplesPath(filepath.Join(samplesPath, "hybrid", "go-helm"))))
+
+	for _, sample := range samples {
+		log.Infof("creating sample at path: %s", sample.Path())
+		sample.Generate()
+	}
 }
